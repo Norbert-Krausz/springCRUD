@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.nok.CRUDtest" tests="4" skipped="0" failures="0" errors="0" timestamp="2024-09-05T07:25:04" hostname="Norberts-MacBook-Air.local" time="0.537">
+  <properties/>
+  <testcase name="deleteUserSuccessfully()" classname="com.nok.CRUDtest" time="0.502"/>
+  <testcase name="putUserSuccessfully()" classname="com.nok.CRUDtest" time="0.016"/>
+  <testcase name="createUser()" classname="com.nok.CRUDtest" time="0.008"/>
+  <testcase name="returnUserSuccessfully()" classname="com.nok.CRUDtest" time="0.007"/>
+  <system-out><![CDATA[
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v3.3.2)
+
+2024-09-05T09:25:02.695+02:00  INFO 36416 --- [    Test worker] com.nok.CRUDtest                         : Starting CRUDtest using Java 22.0.2 with PID 36416 (started by nok in /Users/nok/Documents/Nok/Repos/springCRUD)
+2024-09-05T09:25:02.696+02:00  INFO 36416 --- [    Test worker] com.nok.CRUDtest                         : No active profile set, falling back to 1 default profile: "default"
+2024-09-05T09:25:02.995+02:00  INFO 36416 --- [    Test worker] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2024-09-05T09:25:03.018+02:00  INFO 36416 --- [    Test worker] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 19 ms. Found 1 JPA repository interface.
+2024-09-05T09:25:03.267+02:00  INFO 36416 --- [    Test worker] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 0 (http)
+2024-09-05T09:25:03.274+02:00  INFO 36416 --- [    Test worker] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2024-09-05T09:25:03.274+02:00  INFO 36416 --- [    Test worker] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.26]
+2024-09-05T09:25:03.302+02:00  INFO 36416 --- [    Test worker] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2024-09-05T09:25:03.303+02:00  INFO 36416 --- [    Test worker] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 597 ms
+2024-09-05T09:25:03.366+02:00  INFO 36416 --- [    Test worker] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2024-09-05T09:25:03.462+02:00  INFO 36416 --- [    Test worker] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection conn0: url=jdbc:h2:mem:d133332f-4800-45dd-b7f9-cb9f676940fd user=SA
+2024-09-05T09:25:03.462+02:00  INFO 36416 --- [    Test worker] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2024-09-05T09:25:03.488+02:00  INFO 36416 --- [    Test worker] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2024-09-05T09:25:03.518+02:00  INFO 36416 --- [    Test worker] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.5.2.Final
+2024-09-05T09:25:03.533+02:00  INFO 36416 --- [    Test worker] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2024-09-05T09:25:03.675+02:00  INFO 36416 --- [    Test worker] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2024-09-05T09:25:04.046+02:00  INFO 36416 --- [    Test worker] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2024-09-05T09:25:04.060+02:00  INFO 36416 --- [    Test worker] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2024-09-05T09:25:04.203+02:00  WARN 36416 --- [    Test worker] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2024-09-05T09:25:04.382+02:00  INFO 36416 --- [    Test worker] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 58238 (http) with context path '/'
+2024-09-05T09:25:04.391+02:00  INFO 36416 --- [    Test worker] com.nok.CRUDtest                         : Started CRUDtest in 1.855 seconds (process running for 2.379)
+2024-09-05T09:25:04.775+02:00  INFO 36416 --- [o-auto-1-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2024-09-05T09:25:04.775+02:00  INFO 36416 --- [o-auto-1-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2024-09-05T09:25:04.776+02:00  INFO 36416 --- [o-auto-1-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 0 ms
+]]></system-out>
+  <system-err><![CDATA[WARNING: A Java agent has been loaded dynamically (/Users/nok/.gradle/caches/modules-2/files-2.1/net.bytebuddy/byte-buddy-agent/1.14.18/417558ea01fe9f0e8a94af28b9469d281c4e3984/byte-buddy-agent-1.14.18.jar)
+WARNING: If a serviceability tool is in use, please run with -XX:+EnableDynamicAgentLoading to hide this warning
+WARNING: If a serviceability tool is not in use, please run with -Djdk.instrument.traceUsage for more information
+WARNING: Dynamic loading of agents will be disallowed by default in a future release
+]]></system-err>
+</testsuite>
