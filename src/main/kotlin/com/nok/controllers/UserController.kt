@@ -16,20 +16,20 @@ class UserController(var userService: UserService) {
         return userService.createUser(newUser)
     }
 
-    @GetMapping("/{id}")
-    fun getUser(@PathVariable id: Long): UserDTOResponse {
-        return userService.getUser(id)
-            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "User not found")
-    }
-
-    @PutMapping("/{id}")
-    fun updateUser(@PathVariable id: Long, @RequestBody updatedUser: UserDTORequest): UserDTOResponse {
-        return userService.updateUser(id, updatedUser)
-            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "User not found")
-    }
-
-    @DeleteMapping("/{id}")
-    fun deleteUser(@PathVariable id: Long) {
-        userService.deleteUser(id)
-    }
+//    @GetMapping("/{id}")
+//    fun getUser(@PathVariable id: Long): UserDTOResponse {
+//        return userService.getUser(id)
+//            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "User not found")
+//    }
+//
+//    @PutMapping("/{id}")
+//    fun updateUser(@PathVariable id: Long, @RequestBody updatedUser: UserDTORequest): UserDTOResponse {
+//        return userService.updateUser(id, updatedUser)
+//            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "User not found")
+//    }
+//
+//    @DeleteMapping("/{id}")
+//    fun deleteUser(@PathVariable id: Long) {
+//        userService.deleteUser(id)
+//    }
 }
