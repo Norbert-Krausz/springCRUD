@@ -2,13 +2,13 @@ package com.nok.repositories
 
 import jakarta.persistence.*
 
-@Entity//(name = "address")
+@Entity
 @Table(name= "address")
 data class AddressEntity(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    var id: Long?,
+    var id: Long? = null,
 
     @Column(name = "streetName")
     var streetName: String,
@@ -22,8 +22,9 @@ data class AddressEntity(
     @Column(name = "postcode")
     var postcode: String,
 
-    //@OneToOne(mappedBy = "address")
+    var isCurrent: Boolean = true,
+
     @ManyToOne
     @JoinColumn(name = "user_id")
-    var user: UserEntity//? = null
+    val user: UserEntity
 )

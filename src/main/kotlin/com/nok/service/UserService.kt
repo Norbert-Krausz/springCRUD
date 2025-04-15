@@ -1,5 +1,6 @@
 package com.nok.service
 
+import com.nok.model.AddressDTORequest
 import com.nok.model.AddressDTOResponse
 import com.nok.model.UserDTORequest
 import com.nok.model.UserDTOResponse
@@ -14,74 +15,65 @@ import kotlin.jvm.optionals.getOrNull
 class UserService(var userRepository: UserRepository, var addressRepository: AddressRepository) {
 
     fun createUser(newUser: UserDTORequest): UserDTOResponse {
-        val userEntity = userRepository.save(
-            UserEntity(
-                id = null,
-                firstName = newUser.firstName,
-                lastName = newUser.lastName,
-                email = newUser.email,
-                phoneNumber = newUser.phoneNumber,
-                addresses = mutableListOf()
-//                    AddressEntity(
-//                    id = null,
-//                    streetName = newUser.address.streetName,
-//                    streetNumber = newUser.address.streetNumber,
-//                    city = newUser.address.city,
-//                    postcode = newUser.address.postcode
-//                    )
-                )
-            )
+        val user = UserEntity(
+            id = null,
+            firstName = newUser.firstName,
+            lastName = newUser.lastName,
+            email = newUser.email,
+            phoneNumber = newUser.phoneNumber,
+            addresses = mutableListOf()
+        )
+        val savedUser = userRepository.save(user)
 
-        val addressEntity = AddressEntity(
+        val address = AddressEntity(
             id = null,
             streetName = newUser.address.streetName,
             streetNumber = newUser.address.streetNumber,
             city = newUser.address.city,
             postcode = newUser.address.postcode,
-            user = userEntity
-            )
-        val savedAddress = addressRepository.save(addressEntity)
-
-        // Update user with the new address
-        userEntity.addresses.add(savedAddress)
-        userRepository.save(userEntity)
-
+            user = savedUser
+        )
+        val savedAddress = addressRepository.save(address)
 
         return UserDTOResponse(
-            id = userEntity.id!!,
-            firstName = userEntity.firstName,
-            lastName = userEntity.lastName,
-            email = userEntity.email,
-            phoneNumber = userEntity.phoneNumber,
-            currentAddress = AddressDTOResponse(
+            id = savedUser.id!!,
+            firstName = savedUser.firstName,
+            lastName = savedUser.lastName,
+            email = savedUser.email,
+            phoneNumber = savedUser.phoneNumber,
+            address = AddressDTOResponse(
                 streetName = savedAddress.streetName,
                 streetNumber = savedAddress.streetNumber,
                 city = savedAddress.city,
-                postcode = savedAddress.postcode
-            ),
-            pastAddresses = listOf()
+                postcode = savedAddress.postcode,
+                isCurrent = true
+            )
         )
     }
 
-//    fun getUser(id: Long): UserDTOResponse? {
-//        return userRepository.findById(id)
-//            .map { UserDTOResponse(
-//                id = it.id!!,
-//                firstName = it.firstName,
-//                lastName = it.lastName,
-//                email = it.email,
-//                phoneNumber = it.phoneNumber,
-//                currentAddress = AddressDTOResponse(
-//                    streetName = it.addresses[0].streetName,
-//                    streetNumber = it.address.streetNumber,
-//                    city = it.address.city,
-//                    postcode = it.address.postcode
-//                ),
-//                pastAddresses = listOf()
-//            )
-//        }.getOrNull()
-//    }
-//
+    fun getUser(id: Long): UserDTOResponse? {
+        return userRepository.findById(id)
+            .map { user ->
+                val currentAddress = user.addresses.firstOrNull { it.isCurrent }
+                    ?: throw IllegalStateException("No address for user with id: $id")
+
+                UserDTOResponse(
+                id = user.id!!,
+                firstName = user.firstName,
+                lastName = user.lastName,
+                email = user.email,
+                phoneNumber = user.phoneNumber,
+                address = AddressDTOResponse(
+                    streetName = currentAddress.streetName,
+                    streetNumber = currentAddress.streetNumber,
+                    city = currentAddress.city,
+                    postcode = currentAddress.postcode,
+                    isCurrent = currentAddress.isCurrent
+                )
+            )
+        }.getOrNull()
+    }
+
 //    fun updateUser(id: Long, updatedUser: UserDTORequest): UserDTOResponse? {
 //        return userRepository.findById(id).map {
 //            val save = userRepository.save(UserEntity(
@@ -113,8 +105,47 @@ class UserService(var userRepository: UserRepository, var addressRepository: Add
 //            )
 //        }.orElseGet(null)
 //    }
-//
-//    fun deleteUser(id: Long) {
-//        userRepository.deleteById(id)
-//    }
+
+    fun deleteUser(id: Long) {
+        userRepository.deleteById(id)
+    }
+
+    // *************************
+    // ADDRESS
+    // *************************
+
+    fun updateUserAddress(userId: Long, newAddress: AddressDTORequest) {
+        val user = userRepository.findById(userId).orElseThrow { Exception("User not found.") }
+
+        // Mark old addresses as not current
+        for (address in user.addresses) {
+            address.isCurrent = false;
+            addressRepository.save(address);
+        }
+
+        // Save the new address
+        val address = AddressEntity(
+            streetName = newAddress.streetName,
+            streetNumber = newAddress.streetNumber,
+            city = newAddress.city,
+            postcode = newAddress.postcode,
+            isCurrent = true,
+            user = user
+        )
+        addressRepository.save(address)
+    }
+
+    fun getUserAddresses(userId: Long): List<AddressDTOResponse> {
+        val user = userRepository.findById(userId).orElseThrow { Exception("User not found.") }
+
+        return user.addresses.map { address ->
+            AddressDTOResponse(
+                streetName = address.streetName,
+                streetNumber = address.streetNumber,
+                city = address.city,
+                postcode = address.postcode,
+                isCurrent = address.isCurrent
+            )
+        }
+    }
 }

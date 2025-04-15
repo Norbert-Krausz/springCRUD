@@ -1,7 +1,6 @@
 package com.nok.model
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import jakarta.persistence.Column
 
 data class UserDTORequest (
     @JsonProperty("firstName")
@@ -12,8 +11,6 @@ data class UserDTORequest (
     var email: String,
     @JsonProperty("phoneNumber")
     var phoneNumber: String,
-    @JsonProperty("addresses")
-    var addresses: List<AddressDTORequest>,
     @JsonProperty("address")
     val address: AddressDTORequest
 )

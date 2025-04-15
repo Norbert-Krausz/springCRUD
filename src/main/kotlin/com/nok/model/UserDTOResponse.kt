@@ -13,12 +13,8 @@ data class UserDTOResponse (
     var email: String,
     @JsonProperty("phoneNumber")
     var phoneNumber: String,
-    //@JsonProperty("address")
-    //var address: AddressDTOResponse
-    @JsonProperty("currentAddress")
-    val currentAddress: AddressDTOResponse?,
-    @JsonProperty("pastAddresses")
-    val pastAddresses: List<AddressDTOResponse>
+    @JsonProperty("address")
+    var address: AddressDTOResponse
 )
 
 data class AddressDTOResponse(
@@ -29,5 +25,7 @@ data class AddressDTOResponse(
     @JsonProperty("city")
     var city: String,
     @JsonProperty("postcode")
-    var postcode: String
+    var postcode: String,
+    @JsonProperty("isCurrent")
+    var isCurrent: Boolean
 )
