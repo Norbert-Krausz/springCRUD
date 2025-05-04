@@ -22,7 +22,7 @@ data class UserEntity(
     @Column(name = "phoneNumber")
     var phoneNumber: String,
 
-    @OneToMany(mappedBy = "user", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "user", cascade = [CascadeType.ALL], orphanRemoval = true ,fetch = FetchType.LAZY)
     val addresses: List<AddressEntity> = mutableListOf()
 )
 
