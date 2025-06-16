@@ -1,9 +1,9 @@
 package com.nok.controllers
 
-import com.nok.model.AddressDTORequest
-import com.nok.model.AddressDTOResponse
-import com.nok.model.UserDTORequest
-import com.nok.model.UserDTOResponse
+import com.nok.model.dto.AddressDTORequest
+import com.nok.model.dto.AddressDTOResponse
+import com.nok.model.dto.UserDTORequest
+import com.nok.model.dto.UserDTOResponse
 import com.nok.service.UserService
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
@@ -24,11 +24,11 @@ class UserController(var userService: UserService) {
             ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "User not found")
     }
 
-//    @PutMapping("/{id}")
-//    fun updateUser(@PathVariable id: Long, @RequestBody updatedUser: UserDTORequest): UserDTOResponse {
-//        return userService.updateUser(id, updatedUser)
-//            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "User not found")
-//    }
+    @PutMapping("/{id}")
+    fun updateUser(@PathVariable id: Long, @RequestBody updatedUser: UserDTORequest) {
+        return userService.updateUser(id, updatedUser)
+            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "User not found")
+    }
 
     @DeleteMapping("/{id}")
     fun deleteUser(@PathVariable id: Long) {

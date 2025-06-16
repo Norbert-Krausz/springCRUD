@@ -1,27 +1,23 @@
-package com.nok.repositories
+package com.nok.model
 
+import com.nok.model.enums.UserSeniority
 import jakarta.persistence.*
 
-@Entity//(name = "user")
+@Entity
 @Table(name= "users")
-data class UserEntity(
+public class UserEntity(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    var id: Long? = null,
-
-    @Column(name = "firstName")
+    val id : Long? = null,
     var firstName: String,
-
-    @Column(name = "lastName")
     var lastName: String,
-
-    @Column(name = "email")
     var email: String,
-
-    @Column(name = "phoneNumber")
     var phoneNumber: String,
-
+    // ***FOR MIGRATION PRACTICE***
+    //var years: Int,
+    var yearsExperience: Int,
+    @Enumerated(EnumType.STRING)
+    var seniority: UserSeniority,
     @OneToMany(mappedBy = "user", cascade = [CascadeType.ALL], orphanRemoval = true ,fetch = FetchType.LAZY)
     val addresses: List<AddressEntity> = mutableListOf()
 )

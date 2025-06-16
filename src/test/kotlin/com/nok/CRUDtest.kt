@@ -1,7 +1,7 @@
 package com.nok
 
-import com.nok.model.UserDTORequest
-import com.nok.model.UserDTOResponse
+import com.nok.model.dto.UserDTORequest
+import com.nok.model.dto.UserDTOResponse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired

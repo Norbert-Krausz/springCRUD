@@ -1,12 +1,13 @@
 package com.nok.service
 
-import com.nok.model.AddressDTORequest
-import com.nok.model.AddressDTOResponse
-import com.nok.model.UserDTORequest
-import com.nok.model.UserDTOResponse
-import com.nok.repositories.AddressEntity
+import com.nok.model.dto.AddressDTORequest
+import com.nok.model.dto.AddressDTOResponse
+import com.nok.model.dto.UserDTORequest
+import com.nok.model.dto.UserDTOResponse
+import com.nok.model.AddressEntity
 import com.nok.repositories.AddressRepository
-import com.nok.repositories.UserEntity
+import com.nok.model.UserEntity
+import com.nok.model.enums.UserSeniority
 import com.nok.repositories.UserRepository
 import org.springframework.stereotype.Service
 import kotlin.jvm.optionals.getOrNull
@@ -21,13 +22,19 @@ class UserService(var userRepository: UserRepository, var addressRepository: Add
             lastName = newUser.lastName,
             email = newUser.email,
             phoneNumber = newUser.phoneNumber,
+            // ***FOR MIGRATION PRACTICE***
+            //years = newUser.yearsExperience,
+            yearsExperience = newUser.yearsExperience,
+            seniority = if (newUser.yearsExperience < 3) UserSeniority.J
+            else if (newUser.yearsExperience > 9) UserSeniority.S
+            else UserSeniority.M,
             addresses = mutableListOf()
         )
         val savedUser = userRepository.save(user)
 
         val address = AddressEntity(
             id = null,
-            streetName = newUser.address.streetName,
+            streetName = newUser.address!!.streetName,
             streetNumber = newUser.address.streetNumber,
             city = newUser.address.city,
             postcode = newUser.address.postcode,
@@ -41,6 +48,12 @@ class UserService(var userRepository: UserRepository, var addressRepository: Add
             lastName = savedUser.lastName,
             email = savedUser.email,
             phoneNumber = savedUser.phoneNumber,
+            // ***FOR MIGRATION PRACTICE***
+            //yearsExperience = savedUser.years,
+            yearsExperience = savedUser.yearsExperience,
+            seniority = if (savedUser.yearsExperience < 3) UserSeniority.J.toString()
+                        else if (savedUser.yearsExperience > 9) UserSeniority.S.toString()
+                        else UserSeniority.M.toString(),
             address = AddressDTOResponse(
                 streetName = savedAddress.streetName,
                 streetNumber = savedAddress.streetNumber,
@@ -63,6 +76,10 @@ class UserService(var userRepository: UserRepository, var addressRepository: Add
                 lastName = user.lastName,
                 email = user.email,
                 phoneNumber = user.phoneNumber,
+                // ***FOR MIGRATION PRACTICE***
+                //yearsExperience = user.years,
+                yearsExperience = user.yearsExperience,
+                seniority = user.seniority.toString(),
                 address = AddressDTOResponse(
                     streetName = currentAddress.streetName,
                     streetNumber = currentAddress.streetNumber,
@@ -74,37 +91,18 @@ class UserService(var userRepository: UserRepository, var addressRepository: Add
         }.getOrNull()
     }
 
-//    fun updateUser(id: Long, updatedUser: UserDTORequest): UserDTOResponse? {
-//        return userRepository.findById(id).map {
-//            val save = userRepository.save(UserEntity(
-//                id = it.id,
-//                firstName = updatedUser.firstName,
-//                lastName = updatedUser.lastName,
-//                email = updatedUser.email,
-//                phoneNumber = updatedUser.phoneNumber,
-//                address = AddressEntity(
-//                    id = it.id,
-//                    streetName = updatedUser.address.streetName,
-//                    streetNumber = updatedUser.address.streetNumber,
-//                    city = updatedUser.address.city,
-//                    postcode = updatedUser.address.postcode
-//                )
-//            ))
-//            UserDTOResponse(
-//                id = save.id!!,
-//                firstName = save.firstName,
-//                lastName = save.lastName,
-//                email = save.email,
-//                phoneNumber = save.phoneNumber,
-//                address = AddressDTOResponse(
-//                    streetName = save.address.streetName,
-//                    streetNumber = save.address.streetNumber,
-//                    city = save.address.city,
-//                    postcode = save.address.postcode
-//                )
-//            )
-//        }.orElseGet(null)
-//    }
+    fun updateUser(id: Long, updatedUser: UserDTORequest) {
+        return userRepository.findById(id).map { user ->
+            user.firstName = updatedUser.firstName
+            user.lastName = updatedUser.lastName
+            user.email = updatedUser.email
+            user.phoneNumber = updatedUser.phoneNumber
+            // ***FOR MIGRATION PRACTICE***
+            //user.years = updatedUser.yearsExperience
+            user.yearsExperience = updatedUser.yearsExperience
+            val saved = userRepository.save(user)
+        }.orElse(null)
+    }
 
     fun deleteUser(id: Long) {
         userRepository.deleteById(id)
