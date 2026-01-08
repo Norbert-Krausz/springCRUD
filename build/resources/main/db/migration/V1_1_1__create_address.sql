@@ -1,8 +1,10 @@
-CREATE TABLE IF NOT EXISTS "address"(
-    id              int primary key not null,
-    streetName      varchar         not null,
-    streetNumber    varchar         not null,
-    city            varchar         not null,
-    postcode        varchar         not null,
-    isCurrent       boolean         not null
+CREATE TABLE IF NOT EXISTS address (
+    id BIGSERIAL PRIMARY KEY,
+    streetName VARCHAR(100) NOT NULL,
+    streetNumber VARCHAR(100) NOT NULL,
+    city VARCHAR(100) NOT NULL,
+    postcode VARCHAR(100) NOT NULL,
+    isCurrent BOOLEAN DEFAULT TRUE,
+    userId BIGINT,
+    CONSTRAINT fkUser FOREIGN KEY (userId) REFERENCES users(id)
 )

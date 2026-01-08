@@ -13,7 +13,7 @@ public class AddressEntity(
     val city: String,
     val postcode: String,
     var isCurrent: Boolean = true,
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userId")
     val user: UserEntity
 )

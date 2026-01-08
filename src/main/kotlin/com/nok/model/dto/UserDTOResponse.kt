@@ -1,16 +1,14 @@
 package com.nok.model.dto
 
-import com.nok.model.enums.UserSeniority
-
-data class UserDTOResponse (
+data class UserDTOResponse(
     var id: Long,
-    var firstName: String,
-    var lastName: String,
+    var firstName: String?,
+    var lastName: String?,
     var email: String,
-    var phoneNumber: String,
+    var phoneNumber: String?,
     var yearsExperience: Int,
     var seniority: String,
-    var address: AddressDTOResponse
+    var address: AddressDTOResponse?
 )
 
 data class AddressDTOResponse(

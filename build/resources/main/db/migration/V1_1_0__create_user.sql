@@ -1,7 +1,7 @@
-CREATE TABLE IF NOT EXISTS "users"(
-    id      int primary key not null,
-    firstName    varchar         not null,
-    lastName     varchar         not null,
-    email        varchar         not null,
-    phoneNumber  varchar         not null
+CREATE TABLE IF NOT EXISTS users (
+    id BIGSERIAL PRIMARY KEY,
+    firstName VARCHAR(100) NOT NULL,
+    lastName VARCHAR(100) NOT NULL,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    phoneNumber VARCHAR(20)
 )

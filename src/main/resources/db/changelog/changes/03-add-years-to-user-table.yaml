@@ -1,0 +1,14 @@
+databaseChangeLog:
+  - changeSet:
+      id: 03
+      author: nk
+      changes:
+        - addColumn:
+            tableName: users
+            columns:
+              - column:
+                  name: years
+                  type: SMALLINT
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false

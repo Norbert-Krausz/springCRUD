@@ -21,7 +21,7 @@ class CRUDtest(
 
     @Test
     fun createUser() {
-        val userDTORequest = UserDTORequest("No", "Ro", "noro@test.com", "0944123456")
+        val userDTORequest = UserDTORequest("No", "Ro", "noro@test.com", "0944123456", 5, null)
         val result = this.restTemplate.postForEntity("/users/create", userDTORequest, UserDTOResponse::class.java)
         userId = result.body?.id!!
         assertTrue { result.body?.firstName.equals("No") }
@@ -48,7 +48,7 @@ class CRUDtest(
     @Test
     fun putUserSuccessfully() {
         createUser()
-        val userDTORequest = UserDTORequest("Nono", "Roro", "test2@test.com", "0944654321")
+        val userDTORequest = UserDTORequest("Nono", "Roro", "test2@test.com", "0944654321", 5, null)
         this.restTemplate.put("/users/{id}", userDTORequest, userId)
         val result = this.restTemplate.getForEntity("/users/{id}", UserDTOResponse::class.java, userId)
         assertTrue { result.statusCode.is2xxSuccessful }

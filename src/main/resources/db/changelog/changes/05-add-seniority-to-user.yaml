@@ -1,0 +1,23 @@
+databaseChangeLog:
+  - changeSet:
+      id: 05
+      author: nk
+      changes:
+        - addColumn:
+            tableName: users
+            columns:
+              - column:
+                  name: seniority
+                  type: VARCHAR(10)
+
+        - update:
+            tableName: users
+            columns:
+              - column:
+                  name: seniority
+                  valueComputed: |
+                    CASE
+                      WHEN years_experience < 3 THEN 'J'
+                      WHEN years_experience > 9 THEN 'S'
+                      ELSE 'M'
+                    END

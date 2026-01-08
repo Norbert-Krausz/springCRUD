@@ -1,0 +1,10 @@
+databaseChangeLog:
+  - changeSet:
+      id: 04
+      author: nk
+      changes:
+        - renameColumn:
+            tableName: users
+            oldColumnName: years
+            newColumnName: years_experience
+            columnDataType: SMALLINT
