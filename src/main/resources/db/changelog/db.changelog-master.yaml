@@ -9,3 +9,5 @@ databaseChangeLog:
       file: db/changelog/changes/04-rename-years-to-years_experience.yaml
   - include:
       file: db/changelog/changes/05-add-seniority-to-user.yaml
+  - include:
+      file: db/changelog/changes/06-create-idempotency-table.yaml

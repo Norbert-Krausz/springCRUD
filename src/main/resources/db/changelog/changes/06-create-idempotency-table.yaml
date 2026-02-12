@@ -1,0 +1,36 @@
+databaseChangeLog:
+  - changeSet:
+      id: 06
+      author: nk
+      changes:
+        - createTable:
+            tableName: idempotency_keys
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+
+              - column:
+                  name: idem_key
+                  type: VARCHAR(128)
+                  constraints:
+                    nullable: false
+                    unique: true
+
+              - column:
+                  name: resource_id
+                  type: BIGINT
+
+              - column:
+                  name: completed
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+
+              - column:
+                  name: created_at
+                  type: TIMESTAMPTZ
+                  defaultValueComputed: NOW()

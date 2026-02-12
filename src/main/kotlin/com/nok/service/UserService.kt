@@ -11,8 +11,10 @@ import org.springframework.stereotype.Service
 import kotlin.jvm.optionals.getOrNull
 
 @Service
-class UserService(var userRepository: UserRepository, var addressService: AddressService) {
-
+class UserService(
+    var userRepository: UserRepository,
+    var addressService: AddressService,
+) {
     @Transactional
     fun createUser(newUser: UserDTORequest): UserDTOResponse {
         val user = UserEntity(
@@ -29,20 +31,9 @@ class UserService(var userRepository: UserRepository, var addressService: Addres
             else UserSeniority.M,
             addresses = mutableListOf()
         )
+
         val savedUser = userRepository.save(user)
-
-//        val address = AddressEntity(
-//            id = null,
-//            streetName = newUser.address!!.streetName,
-//            streetNumber = newUser.address.streetNumber,
-//            city = newUser.address.city,
-//            postcode = newUser.address.postcode,
-//            user = savedUser
-//        )
-//        val savedAddress = addressRepository.save(address)
-
         val savedAddress = addressService.saveUserAddress(newUser, savedUser)
-        //savedUser.addresses.add(savedAddress)
         savedAddress?.let { savedUser.addresses.add(it) }
 
         return UserDTOResponse(
@@ -111,45 +102,6 @@ class UserService(var userRepository: UserRepository, var addressService: Addres
     fun deleteUser(id: Long) {
         userRepository.deleteById(id)
     }
-
-    // *************************
-    // ADDRESS
-    // *************************
-
-//    fun updateUserAddress(userId: Long, newAddress: AddressDTORequest) {
-//        val user = userRepository.findById(userId).orElseThrow { Exception("User not found.") }
-//
-//        // Mark old addresses as not current
-//        for (address in user.addresses) {
-//            address.isCurrent = false;
-//            addressRepository.save(address);
-//        }
-//
-//        // Save the new address
-//        val address = AddressEntity(
-//            streetName = newAddress.streetName,
-//            streetNumber = newAddress.streetNumber,
-//            city = newAddress.city,
-//            postcode = newAddress.postcode,
-//            isCurrent = true,
-//            user = user
-//        )
-//        addressRepository.save(address)
-//    }
-//
-//    fun getUserAddresses(userId: Long): List<AddressDTOResponse> {
-//        val user = userRepository.findById(userId).orElseThrow { Exception("User not found.") }
-//
-//        return user.addresses.map { address ->
-//            AddressDTOResponse(
-//                streetName = address.streetName,
-//                streetNumber = address.streetNumber,
-//                city = address.city,
-//                postcode = address.postcode,
-//                isCurrent = address.isCurrent
-//            )
-//        }
-//   }
 }
 
 // endpoint -> payload -> poslat do Kafky

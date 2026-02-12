@@ -7,7 +7,6 @@ import com.nok.model.dto.AddressDTOResponse
 import com.nok.model.dto.UserDTORequest
 import com.nok.repositories.AddressRepository
 import com.nok.repositories.UserRepository
-import jakarta.transaction.Transactional
 import org.springframework.stereotype.Service
 
 @Service

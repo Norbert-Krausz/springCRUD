@@ -8,14 +8,21 @@ import com.nok.model.dto.AddressDTOResponse
 import com.nok.model.dto.UserDTORequest
 import com.nok.model.dto.UserDTOResponse
 import com.nok.service.AddressService
+import com.nok.service.IdempotencyService
 import com.nok.service.UserService
 import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
 
 @RestController
 @RequestMapping("/users")
-class UserController(var userService: UserService, var addressService: AddressService, var userProtoProducer: UserProtoProducer) { //var userProducer: UserProducer
+class UserController(
+    var userService: UserService,
+    var addressService: AddressService,
+    var userProtoProducer: UserProtoProducer,
+    var idemService: IdempotencyService
+) { //var userProducer: UserProducer
 
     @PostMapping("/create")
     fun createUser(@RequestBody newUser: UserDTORequest): UserDTOResponse {
@@ -28,6 +35,23 @@ class UserController(var userService: UserService, var addressService: AddressSe
         userProtoProducer.sendCreateUserCommand(req.toProto())
     }
 
+    @PostMapping("/create-idem")
+    fun createUserIdem(
+        @RequestHeader("Idempotency-Key", required = false) idemKey: String?,
+        @RequestBody reqBody: UserDTORequest
+    ): ResponseEntity<Any>{
+        val key: String = (idemKey ?: return ResponseEntity.status(428).body(mapOf("error" to "Missing Idempotency-Key")))
+        val record = idemService.saveOrGet(key)
+
+        if (record.completed && record.resourceId != null) {
+            val user = userService.getUser(record.resourceId!!)
+            return ResponseEntity.status(201).body(user)
+        }
+
+        val createdUser = userService.createUser(reqBody)
+        idemService.markCompleted(key, createdUser.id)
+        return ResponseEntity.status(201).body(createdUser)
+    }
 
 //    // async creation via Kafka
 //    @PostMapping("/create/async")
