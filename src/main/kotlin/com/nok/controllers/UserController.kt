@@ -1,7 +1,7 @@
 package com.nok.controllers
 
 //import com.nok.kafka.UserProducer
-import com.nok.kafka.UserProtoProducer
+//import com.nok.kafka.UserProtoProducer
 
 import com.nok.model.dto.AddressDTORequest
 import com.nok.model.dto.AddressDTOResponse
@@ -20,7 +20,7 @@ import org.springframework.web.server.ResponseStatusException
 class UserController(
     var userService: UserService,
     var addressService: AddressService,
-    var userProtoProducer: UserProtoProducer,
+    //var userProtoProducer: UserProtoProducer,
     var idemService: IdempotencyService
 ) { //var userProducer: UserProducer
 
@@ -29,28 +29,23 @@ class UserController(
         return userService.createUser(newUser)
     }
 
-    @PostMapping("/create/async-proto")
-    @ResponseStatus(HttpStatus.ACCEPTED)
-    fun createUserAsyncProto(@RequestBody req: UserDTORequest) {
-        userProtoProducer.sendCreateUserCommand(req.toProto())
-    }
+//    @PostMapping("/create/async-proto")
+//    @ResponseStatus(HttpStatus.ACCEPTED)
+//    fun createUserAsyncProto(@RequestBody req: UserDTORequest) {
+//        userProtoProducer.sendCreateUserCommand(req.toProto())
+//    }
 
     @PostMapping("/create-idem")
     fun createUserIdem(
-        @RequestHeader("Idempotency-Key", required = false) idemKey: String?,
-        @RequestBody reqBody: UserDTORequest
-    ): ResponseEntity<Any>{
-        val key: String = (idemKey ?: return ResponseEntity.status(428).body(mapOf("error" to "Missing Idempotency-Key")))
-        val record = idemService.saveOrGet(key)
-
-        if (record.completed && record.resourceId != null) {
-            val user = userService.getUser(record.resourceId!!)
-            return ResponseEntity.status(201).body(user)
+        @RequestHeader("Idempotency-Key") idempotencyKey: String,
+        @RequestBody requestBody: UserDTORequest
+    ): ResponseEntity<Any> {
+        val (result, isNew) = idemService.process(idempotencyKey) {
+            userService.createUser(requestBody)
         }
 
-        val createdUser = userService.createUser(reqBody)
-        idemService.markCompleted(key, createdUser.id)
-        return ResponseEntity.status(201).body(createdUser)
+        val status = if (isNew) HttpStatus.CREATED else HttpStatus.OK
+        return ResponseEntity.status(status).body(result)
     }
 
 //    // async creation via Kafka

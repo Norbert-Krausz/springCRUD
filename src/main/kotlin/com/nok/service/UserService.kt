@@ -103,6 +103,3 @@ class UserService(
         userRepository.deleteById(id)
     }
 }
-
-// endpoint -> payload -> poslat do Kafky
-// listener + save to Db
