@@ -1,108 +1,66 @@
 package com.nok.controllers
 
-//import com.nok.kafka.UserProducer
-//import com.nok.kafka.UserProtoProducer
-
-import com.nok.model.dto.AddressDTORequest
-import com.nok.model.dto.AddressDTOResponse
-import com.nok.model.dto.UserDTORequest
-import com.nok.model.dto.UserDTOResponse
+import com.nok.api.generated.UsersApi
+import com.nok.api.generated.model.AddressRequest
+import com.nok.api.generated.model.AddressResponse
+import com.nok.api.generated.model.UserRequest
+import com.nok.api.generated.model.UserResponse
+import com.nok.api.mappers.toApi
+import com.nok.api.mappers.toDto
 import com.nok.service.AddressService
 import com.nok.service.IdempotencyService
 import com.nok.service.UserService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.*
+import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.server.ResponseStatusException
 
+/**
+ * Contract-first controller: implements the OpenAPI-generated [UsersApi] interface.
+ * All routing/validation annotations come from the generated interface (driven by
+ * src/main/resources/openapi/users-api.yaml) — this class only overrides the methods
+ * and delegates to the existing services.
+ */
 @RestController
-@RequestMapping("/users")
 class UserController(
-    var userService: UserService,
-    var addressService: AddressService,
-    //var userProtoProducer: UserProtoProducer,
-    var idemService: IdempotencyService
-) { //var userProducer: UserProducer
+    private val userService: UserService,
+    private val addressService: AddressService,
+    private val idemService: IdempotencyService,
+) : UsersApi {
 
-    @PostMapping("/create")
-    fun createUser(@RequestBody newUser: UserDTORequest): UserDTOResponse {
-        return userService.createUser(newUser)
-    }
+    override fun createUser(userRequest: UserRequest): ResponseEntity<UserResponse> =
+        ResponseEntity.ok(userService.createUser(userRequest.toDto()).toApi())
 
-//    @PostMapping("/create/async-proto")
-//    @ResponseStatus(HttpStatus.ACCEPTED)
-//    fun createUserAsyncProto(@RequestBody req: UserDTORequest) {
-//        userProtoProducer.sendCreateUserCommand(req.toProto())
-//    }
-
-    @PostMapping("/create-idem")
-    fun createUserIdem(
-        @RequestHeader("Idempotency-Key") idempotencyKey: String,
-        @RequestBody requestBody: UserDTORequest
-    ): ResponseEntity<Any> {
+    override fun createUserIdem(
+        idempotencyKey: String,
+        userRequest: UserRequest,
+    ): ResponseEntity<UserResponse> {
         val (result, isNew) = idemService.process(idempotencyKey) {
-            userService.createUser(requestBody)
+            userService.createUser(userRequest.toDto())
         }
-
         val status = if (isNew) HttpStatus.CREATED else HttpStatus.OK
-        return ResponseEntity.status(status).body(result)
+        return ResponseEntity.status(status).body(result.toApi())
     }
 
-//    // async creation via Kafka
-//    @PostMapping("/create/async")
-//    @ResponseStatus(HttpStatus.ACCEPTED)
-//    fun createUserAsync(@RequestBody req: UserDTORequest) {
-//        userProducer.sendCreateUserEvent(req)
-//    }
-
-
-    @GetMapping("/{id}")
-    fun getUser(@PathVariable id: Long): UserDTOResponse {
-        return userService.getUser(id)
+    override fun getUser(id: Long): ResponseEntity<UserResponse> =
+        userService.getUser(id)?.let { ResponseEntity.ok(it.toApi()) }
             ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "User not found")
+
+    override fun updateUser(id: Long, userRequest: UserRequest): ResponseEntity<Unit> {
+        userService.updateUser(id, userRequest.toDto())
+        return ResponseEntity.noContent().build()
     }
 
-    @PutMapping("/{id}")
-    fun updateUser(@PathVariable id: Long, @RequestBody updatedUser: UserDTORequest) {
-        return userService.updateUser(id, updatedUser)
-            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "User not found")
-    }
-
-    @DeleteMapping("/{id}")
-    fun deleteUser(@PathVariable id: Long) {
+    override fun deleteUser(id: Long): ResponseEntity<Unit> {
         userService.deleteUser(id)
+        return ResponseEntity.noContent().build()
     }
 
-    @PutMapping("/{id}/address")
-    fun updateUserAddress(@PathVariable id: Long, @RequestBody updatedAddress: AddressDTORequest) {
-        return addressService.updateUserAddress(id, updatedAddress )
+    override fun updateUserAddress(id: Long, addressRequest: AddressRequest): ResponseEntity<Unit> {
+        addressService.updateUserAddress(id, addressRequest.toDto())
+        return ResponseEntity.noContent().build()
     }
 
-    @GetMapping("/{id}/addresses")
-    fun getUserAddresses(@PathVariable id: Long): List<AddressDTOResponse> {
-        return addressService.getUserAddresses(id)
-    }
-
-    fun UserDTORequest.toProto(): com.nok.proto.UserCreateCommand =
-        com.nok.proto.UserCreateCommand.newBuilder()
-            .setEmail(email)
-            .setFirstName(firstName ?: "")
-            .setLastName(lastName ?: "")
-            .setPhoneNumber(phoneNumber ?: "")
-            .setYearsExperience(yearsExperience ?: 0)
-            .apply {
-                address?.let { a ->
-                    setAddress(
-                        com.nok.proto.Address.newBuilder()
-                            .setStreetName(a.streetName)
-                            .setStreetNumber(a.streetNumber)
-                            .setPostcode(a.postcode)
-                            .setCity(a.city)
-                            .build()
-                    )
-                }
-            }
-            .build()
-
-
+    override fun getUserAddresses(id: Long): ResponseEntity<List<AddressResponse>> =
+        ResponseEntity.ok(addressService.getUserAddresses(id).map { it.toApi() })
 }

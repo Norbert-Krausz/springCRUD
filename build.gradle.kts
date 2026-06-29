@@ -1,10 +1,12 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.openapitools.generator.gradle.plugin.tasks.GenerateTask
 
 plugins {
     id("com.google.protobuf") version "0.9.4"
     id("org.springframework.boot") version "3.5.3"
     id("io.spring.dependency-management") version "1.1.6"
 //    id("org.flywaydb.flyway") version "11.8.0"
+    id("org.openapi.generator") version "7.23.0"
     kotlin("jvm") version "1.9.24"
     kotlin("plugin.spring") version "1.9.24"
     kotlin("plugin.jpa") version "1.9.24"
@@ -56,6 +58,54 @@ dependencies {
     implementation("org.liquibase:liquibase-core")
     //implementation("org.flywaydb:flyway-core")
     //implementation("org.flywaydb:flyway-database-postgresql")
+
+    // OpenAPI generated code (contract-first)
+    implementation("org.springframework.boot:spring-boot-starter-validation") // jakarta.validation annotations on generated server models
+    implementation("io.swagger.core.v3:swagger-annotations:2.2.21")           // @Schema/@Operation refs in generated server interface
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")                      // transport for the generated jvm-okhttp4 client
+}
+
+// ---- OpenAPI Generator: one contract -> server interface + client ----
+val openApiSpec = "$projectDir/src/main/resources/openapi/users-api.yaml"
+
+val generateUserServer by tasks.registering(GenerateTask::class) {
+    generatorName.set("kotlin-spring")
+    inputSpec.set(openApiSpec)
+    outputDir.set(layout.buildDirectory.dir("generated/server").get().asFile.path)
+    apiPackage.set("com.nok.api.generated")
+    modelPackage.set("com.nok.api.generated.model")
+    configOptions.set(
+        mapOf(
+            "interfaceOnly" to "true",
+            "useSpringBoot3" to "true",
+            "useTags" to "true",
+            "documentationProvider" to "none",
+        )
+    )
+}
+
+val generateUserClient by tasks.registering(GenerateTask::class) {
+    generatorName.set("kotlin")
+    inputSpec.set(openApiSpec)
+    outputDir.set(layout.buildDirectory.dir("generated/client").get().asFile.path)
+    apiPackage.set("com.nok.client.generated")
+    modelPackage.set("com.nok.client.generated.model")
+    configOptions.set(
+        mapOf(
+            "library" to "jvm-okhttp4",
+            "serializationLibrary" to "jackson",
+            "useSpringBoot3" to "true",
+        )
+    )
+}
+
+sourceSets["main"].java {
+    srcDir(layout.buildDirectory.dir("generated/server/src/main/kotlin"))
+    srcDir(layout.buildDirectory.dir("generated/client/src/main/kotlin"))
+}
+
+tasks.named("compileKotlin") {
+    dependsOn(generateUserServer, generateUserClient)
 }
 
 //flyway {
