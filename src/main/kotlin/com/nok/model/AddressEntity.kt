@@ -1,5 +1,6 @@
 package com.nok.model
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import jakarta.persistence.*
 
 @Entity
@@ -15,5 +16,6 @@ public class AddressEntity(
     var isCurrent: Boolean = true,
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userId")
+    @JsonIgnore
     val user: UserEntity
 )

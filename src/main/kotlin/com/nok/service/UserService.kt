@@ -1,10 +1,13 @@
 package com.nok.service
 
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.nok.model.OutboxEvent
 import com.nok.model.dto.AddressDTOResponse
 import com.nok.model.dto.UserDTORequest
 import com.nok.model.dto.UserDTOResponse
 import com.nok.model.UserEntity
 import com.nok.model.enums.UserSeniority
+import com.nok.repositories.OutboxEventRepository
 import com.nok.repositories.UserRepository
 import jakarta.transaction.Transactional
 import org.springframework.stereotype.Service
@@ -14,6 +17,8 @@ import kotlin.jvm.optionals.getOrNull
 class UserService(
     var userRepository: UserRepository,
     var addressService: AddressService,
+    var outboxEventRepository: OutboxEventRepository,
+    val objectMapper: ObjectMapper
 ) {
     @Transactional
     fun createUser(newUser: UserDTORequest): UserDTOResponse {
@@ -36,7 +41,7 @@ class UserService(
         val savedAddress = addressService.saveUserAddress(newUser, savedUser)
         savedAddress?.let { savedUser.addresses.add(it) }
 
-        return UserDTOResponse(
+        val response = UserDTOResponse(
             id = savedUser.id!!,
             firstName = savedUser.firstName,
             lastName = savedUser.lastName,
@@ -57,6 +62,11 @@ class UserService(
                 isCurrent = true)
             }
         )
+
+        // for outbox pattern
+        outboxEventRepository.save(OutboxEvent(payload = objectMapper.writeValueAsString(newUser)))
+
+        return response
     }
 
     fun getUser(id: Long): UserDTOResponse? {
@@ -103,3 +113,5 @@ class UserService(
         userRepository.deleteById(id)
     }
 }
+
+// check VL agentic setup + docs

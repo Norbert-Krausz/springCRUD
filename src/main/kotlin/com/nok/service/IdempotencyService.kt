@@ -16,7 +16,7 @@ class IdempotencyService(
 
         if (existing.isPresent) {
             val cached = objectMapper.readValue(existing.get().responseBody, UserDTOResponse::class.java)
-            return Pair(cached, false)  // false = duplicate
+            return Pair(cached, false)
         }
 
         val result = action()
@@ -26,6 +26,6 @@ class IdempotencyService(
             statusCode = 201
         )
         repo.save(record)
-        return Pair(result, true)  // true = new request
+        return Pair(result, true)
     }
 }

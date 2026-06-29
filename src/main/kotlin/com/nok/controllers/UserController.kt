@@ -1,7 +1,7 @@
 package com.nok.controllers
 
-//import com.nok.kafka.UserProducer
-//import com.nok.kafka.UserProtoProducer
+import com.nok.kafka.UserProducer
+import com.nok.kafka.UserProtoProducer
 
 import com.nok.model.dto.AddressDTORequest
 import com.nok.model.dto.AddressDTOResponse
@@ -20,21 +20,16 @@ import org.springframework.web.server.ResponseStatusException
 class UserController(
     var userService: UserService,
     var addressService: AddressService,
-    //var userProtoProducer: UserProtoProducer,
-    var idemService: IdempotencyService
-) { //var userProducer: UserProducer
-
+    var userProtoProducer: UserProtoProducer,
+    var idemService: IdempotencyService,
+    var userProducer: UserProducer
+) {
     @PostMapping("/create")
     fun createUser(@RequestBody newUser: UserDTORequest): UserDTOResponse {
         return userService.createUser(newUser)
     }
 
-//    @PostMapping("/create/async-proto")
-//    @ResponseStatus(HttpStatus.ACCEPTED)
-//    fun createUserAsyncProto(@RequestBody req: UserDTORequest) {
-//        userProtoProducer.sendCreateUserCommand(req.toProto())
-//    }
-
+    // Idempotency
     @PostMapping("/create-idem")
     fun createUserIdem(
         @RequestHeader("Idempotency-Key") idempotencyKey: String,
@@ -48,13 +43,19 @@ class UserController(
         return ResponseEntity.status(status).body(result)
     }
 
-//    // async creation via Kafka
-//    @PostMapping("/create/async")
-//    @ResponseStatus(HttpStatus.ACCEPTED)
-//    fun createUserAsync(@RequestBody req: UserDTORequest) {
-//        userProducer.sendCreateUserEvent(req)
-//    }
+    // Kafka + Protobuf
+    @PostMapping("/create/async-proto")
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    fun createUserAsyncProto(@RequestBody req: UserDTORequest) {
+        userProtoProducer.sendCreateUserCommand(req.toProto())
+    }
 
+    // Kafka
+    @PostMapping("/create/async")
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    fun createUserAsync(@RequestBody req: UserDTORequest) {
+        userProducer.sendCreateUserEvent(req)
+    }
 
     @GetMapping("/{id}")
     fun getUser(@PathVariable id: Long): UserDTOResponse {
@@ -103,6 +104,6 @@ class UserController(
                 }
             }
             .build()
-
-
 }
+
+// outbox pattern
