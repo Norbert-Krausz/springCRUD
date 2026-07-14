@@ -29,6 +29,36 @@ paths:
               schema:
                 $ref: '#/components/schemas/UserResponse'
 
+  /users/create/async:
+    post:
+      tags: [users]
+      operationId: createUserAsync
+      summary: Create a user asynchronously via Kafka (JSON)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRequest'
+      responses:
+        '202':
+          description: Creation request accepted for async processing
+
+  /users/create/async-proto:
+    post:
+      tags: [users]
+      operationId: createUserAsyncProto
+      summary: Create a user asynchronously via Kafka (Protobuf)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRequest'
+      responses:
+        '202':
+          description: Creation request accepted for async processing
+
   /users/create-idem:
     post:
       tags: [users]

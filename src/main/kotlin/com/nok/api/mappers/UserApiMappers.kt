@@ -54,3 +54,24 @@ fun AddressDTOResponse.toApi(): AddressResponse =
         postcode = postcode,
         isCurrent = isCurrent,
     )
+
+fun UserDTORequest.toProto(): com.nok.proto.UserCreateCommand =
+    com.nok.proto.UserCreateCommand.newBuilder()
+        .setEmail(email)
+        .setFirstName(firstName ?: "")
+        .setLastName(lastName ?: "")
+        .setPhoneNumber(phoneNumber ?: "")
+        .setYearsExperience(yearsExperience)
+        .apply {
+            address?.let { a ->
+                setAddress(
+                    com.nok.proto.Address.newBuilder()
+                        .setStreetName(a.streetName)
+                        .setStreetNumber(a.streetNumber)
+                        .setPostcode(a.postcode)
+                        .setCity(a.city)
+                        .build()
+                )
+            }
+        }
+        .build()

@@ -7,6 +7,9 @@ import com.nok.api.generated.model.UserRequest
 import com.nok.api.generated.model.UserResponse
 import com.nok.api.mappers.toApi
 import com.nok.api.mappers.toDto
+import com.nok.api.mappers.toProto
+import com.nok.kafka.UserProducer
+import com.nok.kafka.UserProtoProducer
 import com.nok.service.AddressService
 import com.nok.service.IdempotencyService
 import com.nok.service.UserService
@@ -26,10 +29,24 @@ class UserController(
     private val userService: UserService,
     private val addressService: AddressService,
     private val idemService: IdempotencyService,
+    private val userProducer: UserProducer,
+    private val userProtoProducer: UserProtoProducer,
 ) : UsersApi {
 
     override fun createUser(userRequest: UserRequest): ResponseEntity<UserResponse> =
         ResponseEntity.ok(userService.createUser(userRequest.toDto()).toApi())
+
+    // Kafka (JSON): fire-and-forget, the listener persists the user
+    override fun createUserAsync(userRequest: UserRequest): ResponseEntity<Unit> {
+        userProducer.sendCreateUserEvent(userRequest.toDto())
+        return ResponseEntity.accepted().build()
+    }
+
+    // Kafka (Protobuf): fire-and-forget via the proto producer
+    override fun createUserAsyncProto(userRequest: UserRequest): ResponseEntity<Unit> {
+        userProtoProducer.sendCreateUserCommand(userRequest.toDto().toProto())
+        return ResponseEntity.accepted().build()
+    }
 
     override fun createUserIdem(
         idempotencyKey: String,
